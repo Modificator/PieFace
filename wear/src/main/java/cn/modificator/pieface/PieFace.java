@@ -56,6 +56,8 @@ public class PieFace extends CanvasWatchFaceService {
 
     public static String KEY_TEXT_HOUR_COLOR = "#04cd99";
     public static String KEY_TEXT_MINUTE_COLOR = "#818181";
+    public static String KEY_TEXT_HOUR_COLOR_CLIP = "#04cd99";
+    public static String KEY_TEXT_MINUTE_COLOR_CLIP = "#818181";
     public static String KEY_TEXT_SECOND_COLOR = "#ff9b50";
 
     /*
@@ -150,6 +152,9 @@ public class PieFace extends CanvasWatchFaceService {
             mHourPaint.setTypeface(ROBOTO_THIN);
             mMinutePaint.setTypeface(ROBOTO_THIN);
 
+            mHourPaint.setTextAlign(Paint.Align.CENTER);
+            mMinutePaint.setTextAlign(Paint.Align.CENTER);
+
 //            mSecondPaint.setStyle(Paint.Style.STROKE);
             mSecondPaint.setStyle(Paint.Style.FILL);
             mSecondPaint.setStrokeWidth(4f);
@@ -223,17 +228,19 @@ public class PieFace extends CanvasWatchFaceService {
             width = bounds.exactCenterX();
             height = bounds.exactCenterY();
 
+            Log.e("------", bounds.toString());
+
             canvas.drawARGB(255, 255, 255, 255);
 
             mHourPaint.setTextSize(bounds.width() * 0.45f);
             mMinutePaint.setTextSize(bounds.width() * 0.45f);
 
-            canvas.drawArc(width*0.05f, width*0.05f, bounds.bottom - width*0.05f, bounds.right - width*0.05f, startAngle - 90, endAngle, true, mSecondPaint);
+            canvas.drawArc(width * 0.05f, width * 0.05f, bounds.bottom - width * 0.05f, bounds.right - width * 0.05f, startAngle - 90, endAngle, true, mSecondPaint);
 
             Rect hourRect = new Rect();
             mHourPaint.getTextBounds(getHour(), 0, 2, hourRect);
-            canvas.drawText(getHour(), width - hourRect.width() / 1.83f, height * 0.9f, mHourPaint);
-            canvas.drawText(getMinute(), width - hourRect.width() / 1.83f, height * 1.1f + hourRect.height(), mMinutePaint);
+            canvas.drawText(getHour(), width, height * 0.9f, mHourPaint);
+            canvas.drawText(getMinute(), width, height * 1.1f + hourRect.height(), mMinutePaint);
 
             if (!addAngle) {
                 startAngle = getSecondAngle();
