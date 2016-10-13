@@ -23,7 +23,9 @@ import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.Region;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,6 +36,7 @@ import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.WindowInsets;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
@@ -52,13 +55,14 @@ public class PieFace extends CanvasWatchFaceService {
     static Paint mHourPaint;
     static Paint mMinutePaint;
     static Paint mSecondPaint;
+    static Paint mBackgroundPaint;
 
 
-    public static String KEY_TEXT_HOUR_COLOR = "#04cd99";
-    public static String KEY_TEXT_MINUTE_COLOR = "#818181";
-    public static String KEY_TEXT_HOUR_COLOR_CLIP = "#04cd99";
-    public static String KEY_TEXT_MINUTE_COLOR_CLIP = "#818181";
-    public static String KEY_TEXT_SECOND_COLOR = "#ff9b50";
+    public static String KEY_TEXT_HOUR_COLOR = "#FF000000";
+    public static String KEY_TEXT_MINUTE_COLOR = "#FF000000";
+    public static String KEY_TEXT_HOUR_COLOR_CLIP = "#FFFFFFFF";
+    public static String KEY_TEXT_MINUTE_COLOR_CLIP = "#FFFFFFFF";
+    public static String KEY_TEXT_SECONDS_COLOR = "#FF000000";
 
     /*
      * Update rate in milliseconds for interactive mode. We update once a second to advance the
@@ -120,7 +124,7 @@ public class PieFace extends CanvasWatchFaceService {
         float height;
         float startAngle = 0;
         float endAngle = 360;
-        boolean addAngle = true;
+        int minute = 0;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -148,7 +152,7 @@ public class PieFace extends CanvasWatchFaceService {
 
             mHourPaint.setColor(Color.parseColor(KEY_TEXT_HOUR_COLOR));
             mMinutePaint.setColor(Color.parseColor(KEY_TEXT_MINUTE_COLOR));
-            mSecondPaint.setColor(Color.parseColor(KEY_TEXT_SECOND_COLOR));
+            mSecondPaint.setColor(Color.parseColor(KEY_TEXT_SECONDS_COLOR));
             mHourPaint.setTypeface(ROBOTO_THIN);
             mMinutePaint.setTypeface(ROBOTO_THIN);
 
@@ -158,6 +162,11 @@ public class PieFace extends CanvasWatchFaceService {
 //            mSecondPaint.setStyle(Paint.Style.STROKE);
             mSecondPaint.setStyle(Paint.Style.FILL);
             mSecondPaint.setStrokeWidth(4f);
+
+
+            mBackgroundPaint = new Paint();
+            mBackgroundPaint.setStyle(Paint.Style.FILL);
+            mBackgroundPaint.setColor(0xff000000);
         }
 
         @Override
@@ -228,30 +237,53 @@ public class PieFace extends CanvasWatchFaceService {
             width = bounds.exactCenterX();
             height = bounds.exactCenterY();
 
+            minute = getMinute();
+
             Log.e("------", bounds.toString());
+            Log.e("------", "seconds: "+getSmoothSeconds());
 
             canvas.drawARGB(255, 255, 255, 255);
 
             mHourPaint.setTextSize(bounds.width() * 0.45f);
             mMinutePaint.setTextSize(bounds.width() * 0.45f);
 
-            canvas.drawArc(width * 0.05f, width * 0.05f, bounds.bottom - width * 0.05f, bounds.right - width * 0.05f, startAngle - 90, endAngle, true, mSecondPaint);
+//            canvas.drawArc(width * 0.05f, width * 0.05f, bounds.bottom - width * 0.05f, bounds.right - width * 0.05f, startAngle - 90, endAngle, true, mSecondPaint);
+
+//            canvas.drawOval(mBackgroundPaint.getStrokeWidth() / 2, mBackgroundPaint.getStrokeWidth() / 2, width - mBackgroundPaint.getStrokeWidth() / 2, height - mBackgroundPaint.getStrokeWidth() / 2, mBackgroundPaint);
+
 
             Rect hourRect = new Rect();
             mHourPaint.getTextBounds(getHour(), 0, 2, hourRect);
             canvas.drawText(getHour(), width, height * 0.9f, mHourPaint);
-            canvas.drawText(getMinute(), width, height * 1.1f + hourRect.height(), mMinutePaint);
+            canvas.drawText(getMinuteStr(), width, height * 1.1f + hourRect.height(), mMinutePaint);
 
-            if (!addAngle) {
-                startAngle = getSecondAngle();
-                endAngle = 360 - startAngle;
-                if (startAngle > 359.8) addAngle = true;
-            } else {
-                startAngle = 0;
-                endAngle = getSecondAngle();
-                if (endAngle > 359.8) addAngle = false;
+            float startAngle = minute % 2 == 0 ? -90 : getSmoothSeconds() * 6f - 90f;
+            float endAngle = minute % 2 == 1 ? 270 - startAngle : getSmoothSeconds() * 6f;
+
+            Path path = new Path();
+            path.moveTo(width, height);
+            path.addArc(0,
+                    0,
+                    bounds.right,
+                    bounds.bottom,
+                    startAngle,
+                    endAngle);
+            path.lineTo(width, height);
+            path.close();
+//            canvas.clipPath(path, Region.Op.REPLACE);
+//            mBackgroundPaint.setColor(0xffffffff);
+            mBackgroundPaint.setColor(0xff000000);
+            mHourPaint.setColor(0xff000000);
+            mMinutePaint.setColor(0xff000000);
+            if (minute % 2 == 0) {
+                mCalendar.add(Calendar.MINUTE, 1);
             }
-//            canvas.drawArc(width*0.05f, width*0.05f, bounds.bottom - width*0.05f, bounds.right - width*0.05f, startAngle - 90, endAngle, true, mSecondPaint);
+            Log.e("------", startAngle + ":" + endAngle);
+//            canvas.drawOval(mBackgroundPaint.getStrokeWidth() / 2, mBackgroundPaint.getStrokeWidth() / 2, width - mBackgroundPaint.getStrokeWidth() / 2, height - mBackgroundPaint.getStrokeWidth() / 2, mBackgroundPaint);
+            mHourPaint.setStrokeWidth(3);
+            mHourPaint.setColor(Color.RED);
+            mHourPaint.setStyle(Paint.Style.STROKE);
+            canvas.drawPath(path, mHourPaint);
 
         }
 
@@ -260,8 +292,16 @@ public class PieFace extends CanvasWatchFaceService {
 //            return String.format("%02d",mCalendar.get(Calendar.HOUR));
         }
 
-        private String getMinute() {
+        private String getMinuteStr() {
             return String.format("%02d", mCalendar.get(Calendar.MINUTE));
+        }
+
+        private int getMinute() {
+            return mCalendar.get(Calendar.MINUTE);
+        }
+
+        private float getSmoothSeconds() {
+            return mCalendar.get(Calendar.SECOND) + mCalendar.get(Calendar.MILLISECOND) / 1000f;
         }
 
         private float getSecondAngle() {
@@ -288,6 +328,12 @@ public class PieFace extends CanvasWatchFaceService {
         @Override
         public void onPeekCardPositionUpdate(Rect rect) {
             super.onPeekCardPositionUpdate(rect);
+        }
+
+        @Override
+        public void onApplyWindowInsets(WindowInsets insets) {
+            super.onApplyWindowInsets(insets);
+            Log.e("-------", insets.toString());
         }
 
         private void registerReceiver() {
