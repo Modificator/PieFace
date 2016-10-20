@@ -24,6 +24,8 @@ import java.util.TimeZone;
 public class PieFaceView extends View {
 
     Paint mHourPaint, mMinutePaint, mSecondPaint, mBackgroundPaint;
+    FaceConfig mFaceConfig;
+
     boolean isSecondFull = false;
     float width;
     float height;
@@ -141,7 +143,7 @@ public class PieFaceView extends View {
         mHourPaint.setStyle(Paint.Style.STROKE);
 //        mHourPaint.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fzltcxhjt.TTF"));
         mHourPaint.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "Roboto-Thin.ttf"));
-        mHourPaint.setColor(0xffffffff);
+        mHourPaint.setColor(getFaceConfig().getHourColor());
         mHourPaint.setTextSize(mFaceSize / 2.2f);
         mHourPaint.setTextAlign(Paint.Align.CENTER);
 
@@ -171,5 +173,23 @@ public class PieFaceView extends View {
         height = bottom - top;
         mFaceSize = Math.min(width, height);
         createPaints();
+    }
+
+    public void setFaceConfig(FaceConfig faceConfig) {
+        this.mFaceConfig = faceConfig;
+    }
+
+    public FaceConfig getFaceConfig() {
+        if (mFaceConfig == null) {
+            mFaceConfig = new FaceConfig();
+            mFaceConfig.setBackgroundColor(0xffffffff);
+            mFaceConfig.setBackgroundClipColor(0xff000000);
+            mFaceConfig.setHourColor(0xff000000);
+            mFaceConfig.setHourClipColor(0xffffffff);
+            mFaceConfig.setMinuteColor(0xff000000);
+            mFaceConfig.setMinuteClipColor(0xffffffff);
+            mFaceConfig.setFullSeconds(true);
+        }
+        return mFaceConfig;
     }
 }
