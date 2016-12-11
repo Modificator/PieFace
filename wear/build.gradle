@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    buildToolsVersion '25.0.1'
     defaultConfig {
         applicationId "cn.modificator.pieface"
         minSdkVersion 22
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
@@ -29,6 +29,6 @@ dependencies {
     compile('com.google.android.gms:play-services-wearable:7.8.87') {
         exclude group: 'com.android.support'
     }
-    compile 'com.android.support:palette-v7:24.2.1'
-    compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.android.support:palette-v7:25.0.1'
+    compile 'com.android.support:support-v4:25.0.1'
 }
