@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0-alpha2'
+        classpath 'com.android.tools.build:gradle:2.3.1'
         classpath 'com.ticwear.tools.build:gradle:1.1.0'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -16,10 +16,9 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven {
+//        maven {
 //            url "${rootProject.projectDir}/google-play-services-7-8-87"
-            url "https://raw.githubusercontent.com/Modificator/google-play-services-7-8-87/master"
-        }
+//        }
     }
 }
 

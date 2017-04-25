@@ -7,8 +7,3 @@
 /build
 /captures
 .externalNativeBuild
-*.apk
-.idea/sonarlint
-.idea/markdown-navigator/
-.idea/markdown-navigator.xml
-/.idea/markdown-exported-files.xml
