@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'ticwear'
+apply plugin: 'cn.modificator.autouploadapk'
 
 android {
     compileSdkVersion 25
@@ -29,4 +30,8 @@ dependencies {
 //    compile 'com.google.android.gms:play-services:9.4.0'
     compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
+}
+configurations.all {
+    // check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
